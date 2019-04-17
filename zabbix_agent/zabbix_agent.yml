@@ -1,4 +1,4 @@
 # Install zabbix_server
-- hosts: k8s-node01
+- hosts: k8s-node01 #Test hostname;
   roles:
-    - zabbix_agent
+    - zabbix_agent  #Test hostname;
