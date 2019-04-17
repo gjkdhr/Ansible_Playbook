@@ -2,5 +2,5 @@
 #- hosts: all:localhost
 #- hosts: test
   roles:
-    - system_init
+    - system_init   #指定playbook中task的文件夹
 
