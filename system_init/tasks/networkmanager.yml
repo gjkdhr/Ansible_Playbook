@@ -1,0 +1,11 @@
+---
+
+- name: Stopping the NetworkManager.service
+  systemd:
+    name: NetworkManager
+    state: stopped
+    enabled: no
+  when: ansible_os_family == 'RedHat' and ansible_distribution_version.split('.')[0] == '7'
+
+
+  

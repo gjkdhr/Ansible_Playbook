@@ -1,0 +1,6 @@
+- hosts: i2share_server
+#- hosts: all:localhost
+#- hosts: test
+  roles:
+    - system_init
+

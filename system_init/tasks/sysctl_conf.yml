@@ -1,0 +1,16 @@
+---
+
+- name: Set vm.overcommit_memory to 1 in /etc/sysctl.conf.
+  sysctl:
+    name: vm.overcommit_memory
+    value: 1
+    state: present
+    reload: yes
+
+- name: Set vm.swappiness to 1 in /etc/sysctl.conf.
+  sysctl:
+    name: vm.swappiness
+    value: 1
+    state: present
+    reload: yes
+

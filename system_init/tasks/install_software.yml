@@ -1,0 +1,91 @@
+---
+
+- name: Install view IP infomation command.
+  yum:
+    name: net-tools
+    state: present
+
+- name: Install Web Browsers.
+  yum:
+    name: elinks
+    state: present
+
+- name: Install File system tree viewer.
+  yum:
+    name: tree
+    state: present
+
+- name: Install EPEL Reposity.
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install the VIM editor.
+  yum:
+    name: vim-enhanced
+    state: present
+
+- name: Install The client program for the Telnet.
+  yum:
+    name: telnet
+    state: present
+
+- name: Install VIM Editor Tools.
+  yum:
+    name: vim-enhanced
+    state: present
+
+
+- name: Install libselinux-python of ansible.
+  yum:
+    name: libselinux-python
+    state: present
+
+- name: CentOS6 Install nc command.
+  yum:
+    name: nc
+    state: present
+  when: ansible_os_family == 'RedHat' and ansible_distribution_version.split('.')[0] == '6'
+
+- name: CentOS7 Install nc command.
+  yum:
+    name: nmap-ncat
+    state: present
+  when: ansible_os_family == 'RedHat' and ansible_distribution_version.split('.')[0] == '7'
+
+- name: Install Development and Compilable Tool.
+  yum:
+    name:
+      - gcc
+      - gcc-c++
+      - make
+      - cmake
+      - autoconf
+      - bzip2
+      - bzip2-devel
+      - curl
+      - openssl
+      - openssl-devel
+      - rsync
+      - gd
+      - zip
+      - perl
+      - unzip
+      - wget
+      - ntpdate
+      - sysstat
+      - man
+      - mtr
+      - lsof
+      - iotop
+      - openssl-perl
+      - git
+    state: present
+
+- name: Update System Installed Package.
+  yum:
+    name: '*'
+    state: latest
+
+
+

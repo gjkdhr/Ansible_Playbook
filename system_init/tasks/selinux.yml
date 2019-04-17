@@ -1,0 +1,8 @@
+---
+
+- name: Setting Selinux is Disabled.
+  lineinfile:
+    path: /etc/sysconfig/selinux
+    regexp: '^SELINUX='
+    line: 'SELINUX=disabled'
+

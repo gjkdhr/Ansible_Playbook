@@ -1,0 +1,44 @@
+---
+
+- include: install_software.yml
+  tags:
+    - install_software
+
+
+- include: iptables.yml
+  tags:
+    - iptables.yml
+
+
+- include: limit_files.yml
+  tags:
+    - limit_files
+
+
+
+- include: sysctl_conf.yml
+  tags:
+    - sysctl_conf
+
+
+
+
+- include: selinux.yml
+  tags:
+    - selinux
+
+     
+
+- include: bash_setting.yml
+  tags:
+    - bash_setting
+ 
+
+- include: networkmanager.yml
+  tags:
+    - networkmanager
+
+
+#- include: optimization_ipv4.yml
+#  tags:
+#    - optimization_ipv4

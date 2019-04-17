@@ -1,0 +1,14 @@
+---
+
+- name: add vi = 'vim' to /root/.bashrc
+# lineinfile:
+#   path: /root/.bashrc
+#   line: "alias vm='vim'"
+  blockinfile:
+    path: /root/.bashrc
+    insertbefore: '^alias rm'
+    block: "alias vi='vim'"
+
+- name: Flush /root/.bashrc Variables.
+  raw: source /root/.bashrc
+
