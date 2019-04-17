@@ -1,0 +1,141 @@
+---
+- name: "Install_From_Source | Check if zabbix_server local file is already configured."
+  stat:
+    path: "{{ zabbix_server_file_path }}"
+  register: zabbix_server_file_path_result
+
+- name: "Install_From_Source | If not exists Create {{ software_files_path }} directory."
+  file:
+    path: "{{ software_files_path }}"
+    state: directory
+  register: software_files_path_result
+  when: 
+    - not zabbix_server_file_path_result.stat.exists
+
+- name: "Install_From_Source | Copy the zabbix install package into {{ software_files_path }}"
+  copy:
+    src: "files/{{ zabbix_server_file }}"
+    dest: "{{ software_files_path }}"
+    owner: "{{ ansible_user_gecos }}"
+    group: "{{ ansible_user_gecos }}"
+  when: 
+    - not zabbix_server_file_path_result.stat.exists
+#    - software_files_path_result.stat.exists
+
+- name: "Install_From_Source | Confirm the existsence of the installation directory"
+  file:
+    path: "{{ software_install_path }}"
+    state: directory
+
+- name: "Install_From_Source | Create zabbix_server group"
+  group:
+    name: "{{ zabbix_server_group }}"
+    state: present
+ 
+- name: "Install_From_Source | Create zabbix_server user"
+  user:
+    name: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+    state: present
+    shell: /sbin/nologin
+    createhome: no
+
+- name: "Install_From_Source | Delete zabbix Unpacking package If exists"
+  file:
+    path: "{{ zabbix_server_source_dir }}"
+    state: absent
+
+- name: "Install_From_Source | Copy zabbix_server file to agent"
+  unarchive:
+    src: "files/{{ zabbix_server_file }}"
+    dest: "/tmp/"
+    owner: "{{ ansible_user_gecos }}"
+    group: "{{ ansible_user_gecos }}"
+    
+- name: "Install_From_Source | Ensure dependencies for building from source are installed"
+  yum:
+    name:
+      - gcc
+      - fping
+      - libxml2-devel
+      - unixODBC-devel
+      - net-snmp-devel
+      - libcurl-devel
+      - libssh2-devel
+      - OpenIPMI-devel
+      - openssl-devel
+      - openldap-devel
+      - libevent-devel
+      - pcre-devel
+      - pcre2-devel
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: "Install_From_Source | Check if zabbix_agentd init file is already configured"
+  stat:
+    path: /etc/init.d/zabbix_agentd
+  register: zabbix_agentd_init_file_result
+
+- name: "Install_From_Source | Check if java jdk is already"
+  stat:
+    path: "{{ java_jdk_dir }}"
+  register: java_jdk_dir_result
+
+- name: "Install_From_Source | Run configure script If JDK Not Exists"
+  shell: ./configure --prefix=/usr/local/zabbix  --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
+  args:
+    chdir: "{{ zabbix_server_source_dir }}"
+#    executable: /bin/bash
+  when: 
+    - not zabbix_agentd_init_file_result.stat.exists 
+    - not java_jdk_dir_result.stat.exists
+
+- name: "Install_From_Source | Run configure script If JDK Exixts"
+  shell: ./configure --prefix=/usr/local/zabbix  --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2 --enable-java
+  args:
+    chdir: "{{ zabbix_server_source_dir }}"
+#    executable: /bin/bash
+  when: 
+    - not zabbix_agentd_init_file_result.stat.exists
+    - java_jdk_dir_result.stat.exists
+
+- name: "Install_From_Source | Make and install zabbix_server" 
+  shell: make install
+  args:
+    chdir: "{{ zabbix_server_source_dir }}"
+  when: not zabbix_agentd_init_file_result.stat.exists
+ 
+- name: "Install_From_Source | Ensure zabbix_agentd init script is installed"
+  template:
+    src: templates/zabbix_agentd.j2
+    dest: /etc/init.d/zabbix_agentd
+    mode: 0755
+#    remote_src: yes
+  register: command_result
+  ignore_errors: yes
+  changed_when: true
+
+#- name: "Make sure zabbix_agentd is started on runlevels 3 and 5"
+#  sysvinit:
+#      name: zabbix_agentd
+#      state: started
+#      enabled: yes
+#      runlevels:
+#        - 3
+#        - 4
+#        - 5
+
+
+- name: "Install_From_Source | Copy the zabbix conf file."
+  template:
+    src: templates/zabbix_agentd.conf.j2
+    dest: "{{ zabbix_server_conf_path }}/zabbix_agentd.conf"
+    mode: 0644
+
+- name: "Install_From_Source | Ensure zabbix executable is configure"
+  template:
+    src: templates/zabbix.sh.j2
+    dest: /etc/profile.d/zabbix.sh
+    force: yes
+    mode: 0644
+    

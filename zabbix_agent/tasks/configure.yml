@@ -1,0 +1,113 @@
+---
+- name: "Configure_Agent_Logpath | Check  the zabbix agent log path"
+  stat:
+    path: "{{ zabbix_agent_logs_path }}"
+  register: zabbix_agent_logs_path_result
+
+- name: "Configure_Agent_Logpath | Create zabbix agent log path"
+  file:
+    path: "{{ zabbix_agent_logs_path }}"
+    state: directory
+    owner: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+  when:
+    - not zabbix_agent_logs_path_result.stat.exists
+
+- name: "Configure_Agent_Logpath | Check  the zabbix agent log file"
+  stat:
+    path: "{{ zabbix_agent_logs_file }}"
+  register: zabbix_agent_logs_file_result
+
+- name: "Configure_Agent_Logpath | Create zabbix agent log file If not exists"
+  file:
+    path: "{{ zabbix_agent_logs_file }}"
+    state: touch
+    owner: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+  when:
+    -  not zabbix_agent_logs_file_result.stat.exists
+
+
+
+- name: "Configure_Agent_PID_Path| Check the zabbix agent pid path"
+  stat:
+    path: "{{ zabbix_agent_pid_path }}"
+  register: zabbix_agent_pid_path_result
+
+- name: "Configure_Agent_Logpath | Create zabbix agent pid path"
+  file:
+    path: "{{ zabbix_agent_pid_path }}"
+    state: directory
+    owner: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+    mode: 0755
+  when:
+    - not zabbix_agent_pid_path_result.stat.exists
+
+
+#- name: "Configure_Agent_Pidfile | Check the zabbix agent pid file"
+#  stat:
+#    path: "{{ zabbix_agent_pid_file }}"
+#  register: zabbix_agent_pid_file_result
+
+#- name: "Configure_Agent_Pidfile | Create zabbix agent pid file If not exists"
+#  file:
+#    path: "{{ zabbix_agent_pid_file }}"
+#    state: touch
+#    owner: "{{ zabbix_server_user }}"
+#    group: "{{ zabbix_server_group }}"
+#  when:
+#    - not zabbix_agent_pid_file_result.stat.exists
+
+
+- name: "Configure_Agent_ScriptsPath | Check the zabbix agent ScriptPath Directory"
+  stat:
+    path: "{{ zabbix_agent_ScriptsPath }}"
+  register: zabbix_agent_ScriptsPath_result
+
+- name: "Configure_Agent_ScriptsPath | Create zabbix agent ScriptsPath path If not exists."
+  file:
+    path: "{{ zabbix_agent_ScriptsPath }}"
+    state: directory
+    owner: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+  when:
+    - not zabbix_agent_ScriptsPath_result.stat.exists
+
+
+
+- name: "Configure_Agent_Confpath | Check the zabbix agent config path"
+  stat:
+    path: "{{ zabbix_server_conf_path }}"
+  register: zabbix_agent_conf_path_result
+
+- name: "Configure_Agent_Confpath | Create zabbix agent IncludeConfdir If not exists"
+  file:
+    path: "{{ zabbix_agent_IncludeConfdir }}"
+    state: directory
+  when:
+    - zabbix_agent_conf_path_result.stat.exists
+
+- name: "Configure | Setting {{ zabbix_server_install_path }} File Owner"
+  file:
+    path: "{{ zabbix_server_install_path }}"
+    owner: "{{ zabbix_server_user }}"
+    group: "{{ zabbix_server_group }}"
+    recurse: yes
+
+
+- name: "Configure | Add zabbix_agentd to init.d."
+  command: /sbin/chkconfig zabbix_agentd on
+
+- name: "Configure | Ensure zabbix is running"
+#  shell: /usr/local/zabbix/sbin/zabbix_agentd
+  service:
+    name: zabbix_agentd
+    state: started
+
+
+- name: "Wait {{ zabbix_agent_port }} port is opening."
+  wait_for:
+    port: "{{ zabbix_agent_port }}"
+    delay: 5
+

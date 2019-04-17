@@ -1,0 +1,24 @@
+---
+# vars file for zabbix_server
+
+software_files_path: "/mnt/install_package"
+software_install_path: "/usr/local"
+
+#zabbix_server_version: "3.4.14"
+zabbix_server_version: "4.0.1"
+zabbix_server_install_from_source: true
+
+zabbix_server_file: "zabbix-{{ zabbix_server_version }}.tar.gz"
+zabbix_server_file_path: "{{ software_install_path }}/zabbix"
+
+zabbix_server_user: zabbix
+zabbix_server_group: zabbix
+zabbix_server_hostname: "Zabbix server"
+
+java_jdk_dir: "/usr/local/java"
+
+zabbix_server_source_dir: "/tmp/{{ zabbix_server_file | replace('.tar.gz','') }}"
+zabbix_server_install_path: "{{ software_install_path }}/zabbix"
+
+zabbix_agent_logs_path: "/var/log/zabbix_agent"
+zabbix_agent_port: "10050"
