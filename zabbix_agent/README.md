@@ -10,8 +10,23 @@ Any pre-requisites that may not be covered by Ansible itself or the role should 
 
 Role Variables
 --------------
+# defaults file for zabbix_agent
+zabbix_agent_logs_path: "/var/log/zabbix_agent"
+zabbix_agent_logs_file: "{{ zabbix_agent_logs_path }}/zabbix_agent.log"
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+zabbix_agent_pid_path: "/var/run/zabbix"
+zabbix_agent_pid_file: "{{ zabbix_agent_pid_path }}/zabbix_agent.pid"
+zabbix_agent_ScriptsPath: "{{ zabbix_server_install_path }}/scripts"
+
+zabbix_server_FpingLocation: "/usr/sbin/fping"
+zabbix_server_conf_path: "{{ zabbix_server_install_path }}/etc"
+
+zabbix_server_IncludeConfdir: "{{ zabbix_server_conf_path }}/zabbix_server.conf.d"
+zabbix_agent_IncludeConfdir: "{{ zabbix_server_conf_path }}/zabbix_agentd.conf.d"
+
+zabbix_server_ip: "192.168.201.220"
+
+
 
 Dependencies
 ------------
